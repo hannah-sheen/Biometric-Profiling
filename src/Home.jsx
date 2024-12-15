@@ -13,11 +13,12 @@ function Home() {
                 <img src={fingerprint} alt="Fingerprint" className="max-h-full max-w-full object-contain"/> <p className='text-[25px] text-custom-grey2 pl-[1rem]'>Scan My Fingerpint</p>
               </button>
 
-              <div className="flex items-center w-[500px] m-[3rem]">
+              <div className="flex items-center w-[500px] m-[3rem]"> 
                 <div className="flex-grow border-t border-txt-color/100"></div>
                 <span className="px-4 text-txt-color/100">or</span>
                 <div className="flex-grow border-t border-txt-color/100"></div>
               </div>
+
 
               <button className="h-[100px] w-[400px] border-2 border-txt-color bg-txt-color rounded-lg flex items-center justify-center ml-[100px]">
                 <img src={profile} alt="Fingerprint" className="h-[60px] w-[60px] object-contain"/> <p className='text-[25px] text-white pl-[1.5rem]'>Create My Profile</p>
