@@ -10,7 +10,12 @@ export default {
         'custom-green': '#4D6A6D', 
         'custom-grey' : '#C5C5C5',
         'txt-color' : '#4C5B61',
-        'custom-grey2': '#829191'
+        'custom-grey2': '#829191',
+        'custom-blue' : '#6A7D85'
+      },
+
+      fontFamily: {
+        montserrat: ["'Montserrat'", 'sans-serif'],
       },
     }, 
   }, 
