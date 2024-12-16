@@ -1,14 +1,17 @@
-import { useState } from 'react'
-import './App.css'
-import Home from './Home.jsx'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import './App.css';
+import Home from './Home.jsx';
+import CreateProfile from './CreateProfile.jsx';
 
 function App() {
-
   return (
-    <Home></Home>
-  )
-  
-
+    <Router> 
+      <Routes> 
+        <Route path="/" element={<Home />} /> 
+        <Route path="/create-profile" element={<CreateProfile />} /> 
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;

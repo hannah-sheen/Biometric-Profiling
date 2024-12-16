@@ -1,10 +1,10 @@
 @tailwind base;
 html,
-body {
+body{
   margin: 0;
   padding: 0;
-  height: 100%; /* Ensure that html and body take up the full height */
-  overflow: hidden; /* Prevent scrolling */
+  height: 100%;
+  background-color: #4D6A6D;
 }
 @tailwind components;
 @tailwind utilities;
