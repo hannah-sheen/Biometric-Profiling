@@ -1,200 +1,127 @@
-  import express from 'express';
-  import cors from 'cors';
-  import knex from 'knex';
-  import multer from 'multer';
+import express from 'express';
+import multer from 'multer';
+import cors from 'cors';
+import pkg from 'pg';
+const { Client } = pkg;
 
-  const app = express();
+// Create Express app
+const app = express();
+const port = 5000;
 
+app.use(cors());
+app.use(express.json({ limit: '50mb' })); // Adjust the size limit as needed
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// Set up multer for parsing form-data (for image upload)
+const storage = multer.memoryStorage(); // Store files in memory
+const upload = multer({ storage: storage });
 
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'uploads/');  // Specify the folder where files should be saved
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + '-' + file.originalname);  // Specify the file naming convention
-    }
-  });
-
-  const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 } // Limit to 5 MB
+// Database connection
+const con = new Client({
+  host: "localhost",
+  user: "postgres",
+  port: 5433,
+  password: 'hannahbisheen',
+  database: "IHCBiometric"
 });
 
+con.connect()
+  .then(() => console.log("Connected to the database"))
+  .catch(err => console.error("Connection error", err.stack));
+
+// Handle the POST request for profile
+app.post('/temp-profile', upload.single('image'), async (req, res) => { 
+  try {
+    console.log("Received data:", req.body); // Logs other fields sent in the formData
+
+    // Get the image (buffer from the form)
+    const imageBuffer = req.file?.buffer; // Multer will store the file as a buffer in `req.file`
 
 
-  // Middleware
-  app.use(cors({
-    origin: 'http://localhost:5173', 
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-  }));
-  app.use(express.json());
-
-  // Knex configuration for PostgreSQL connection
-  const db = knex({
-    client: 'pg',
-    connection: {
-      host: 'localhost',
-      user: 'postgres',
-      password: 'hannahbisheen',
-      database: 'IHCBiometric',
-      port: 5433
-    },
-  });
-
-  app.post('/create-profile', upload.single('image'), async (req, res) => {
-
-    const imagepath = req.file.path
+    // Extract other profile data
     const {
-      firstname,
-      lastname,
-      middlename,
-      suffix,
-      birthdate,
-      nationality,
-      religion,
-      height,
-      weight,
-      eyecol,
-      haircol,
-      occupation,
-      telnum,
-      phonenum,
-      email,
-      education,
-      gender,
-      maritalStat,
-      street,
-      barangay,
-      city,
-      province,
-      zip,
-      motherFirstname,
-      motherLastname,
-      motherMiddlename,
-      motherDob,
-      motherContact,
-      motherEmail,        
-      motherOccupation,
-      motherEmployer,
-      motherEmployerAddr,
-      motherTelFax,
-      fatherFirstname,
-      fatherLastname,
-      fatherMiddlename,
-      fatherDob,
-      fatherContact,
-      fatherEmail,
-      fatherOccupation,
-      fatherEmployer,
-      fatherEmployerAddr,
-      fatherTelFax,
-      guardianFirstname,
-      guardianLastname,
-      guardianMiddlename,
-      guardianRelationship ,
-      guardianContact,
-      guardianEmail,
-      guardianHomeAddr,
+      firstname, lastname, middlename, suffix, birthdate, eyecol, haircol,
+      occupation, education, phonenum, telnum, email, gender, maritalStat,
+      religion, nationality, height, weight, street, barangay, city, province, zip,
+      motherFirstname, motherLastname, motherMiddlename, motherDob, motherContact,
+      motherEmail, motherOccupation, motherEmployer, motherEmployerAddr, motherTelFax,
+      fatherFirstname, fatherLastname, fatherMiddlename, fatherDob, fatherContact,
+      fatherEmail, fatherOccupation, fatherEmployer, fatherEmployerAddr, fatherTelFax,
+      guardianFirstname, guardianLastname, guardianMiddlename, guardianRelationship,
+      guardianContact, guardianEmail, guardianHomeAddr
     } = req.body;
 
-    console.log('Request received at /create-profile:', req.body);
+    // Step 1: Insert profile data into user_profile table
+    const userInsertQuery = `
+      INSERT INTO user_profile (
+        user_fname, user_middlename, user_lname, user_suffix, user_birthdate,
+        user_eye_color, user_hair_color, user_occupation, user_educ_lvl, user_contact,
+        user_tel_num, user_email, user_gender, user_marital_stat, user_religion,
+        user_nationality, user_height, user_weight, user_street, user_barangay, user_city,
+        user_province, user_zipcode, user_image
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
+        $21, $22, $23, $24
+      ) RETURNING user_id;
+    `;
 
-    const trx = await db.transaction(); // Start a transaction
-    try {
-      // Insert into user_info
-      const userResult = await trx('user_profile')
-        .insert({
-          user_fname: firstname,
-          user_middlename: middlename || null,
-          user_lname: lastname,
-          user_suffix: suffix || null,
-          user_birthdate: birthdate,
-          user_eye_color: eyecol,
-          user_hair_color: haircol,
-          user_occupation: occupation || null,
-          user_educ_lvl: education,
-        // user_pob: placeOfBirth,
-          user_contact: parseInt(phonenum),
-          user_tel_num: parseInt(telnum) || null,
-          user_email: email,
-          user_gender: gender,
-          user_marital_stat: maritalStat,
-          user_religion: religion || null,
-          user_nationality: nationality,
-          user_height: parseFloat(height),
-          user_weight: parseFloat(weight),
-          user_street: street,
-          user_barangay: barangay,
-          user_city: city,
-          user_province: province,
-          user_zipcode: parseInt(zip),
-          user_image: imagepath
-        })
-        .returning('user_id'); // Ensure user_id is returned
+    const result = await con.query(userInsertQuery, [
+      firstname, middlename || null, lastname, suffix || null, birthdate, eyecol, haircol, occupation || null,
+      education, phonenum, telnum || null, email, gender, maritalStat, religion || null, nationality,
+      parseFloat(height), parseFloat(weight), street, barangay, city, province, zip, imageBuffer
+    ]);
 
-      console.log('User Info Inserted:', userResult);
+    const userId = result.rows[0].user_id; // Get the generated user_id
 
-      const userId = userResult[0]?.user_id; // Access the returned user_id
-      if (!userId) {
-        throw new Error('Failed to retrieve user_id after insertion');
-      }
+    // Insert mother, father, and guardian data
+    const motherInsertQuery = `
+      INSERT INTO mother (
+        user_id, mom_fname, mom_lname, mom_middlename, mom_dob, mom_occupation,
+        mom_contact, mom_email, mom_emp, mom_emp_ad, mom_tel
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+      );
+    `;
+    await con.query(motherInsertQuery, [
+      userId, motherFirstname, motherLastname, motherMiddlename || null, motherDob,
+      motherOccupation || null, motherContact, motherEmail || null, motherEmployer || null,
+      motherEmployerAddr || null, motherTelFax || null
+    ]);
 
-      // Insert Mother's Information
-      await trx('mother').insert({
-        user_id: userId,
-        mom_fname: motherFirstname,
-        mom_lname: motherLastname,
-        mom_middlename: motherMiddlename || null,
-        mom_dob: motherDob,
-        //parent_pob: MPOB,
-        mom_occupation: motherOccupation || null,
-        mom_contact: parseInt(motherContact),
-        mom_email: motherEmail || null,
-        mom_emp: motherEmployer || null,
-        mom_emp_ad: motherEmployerAddr || null,
-        mom_tel: motherTelFax || null
-      });
+    const fatherInsertQuery = `
+      INSERT INTO father (
+        user_id, fath_fname, fath_lname, fath_middlename, fath_dob, fath_occupation,
+        fath_contact, fath_email, fath_emp, fath_emp_ad, fath_tel
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+      );
+    `;
+    await con.query(fatherInsertQuery, [
+      userId, fatherFirstname, fatherLastname, fatherMiddlename || null, fatherDob,
+      fatherOccupation || null, fatherContact, fatherEmail || null, fatherEmployer || null,
+      fatherEmployerAddr || null, fatherTelFax || null
+    ]);
 
-      // Insert Father's Information
-      await trx('father').insert({
-        user_id: userId,
-        fath_fname: fatherFirstname,
-        fath_lname: fatherLastname,
-        fath_middlename: fatherMiddlename || null,
-        fath_dob: fatherDob,
-        //parent_pob: FPOB,
-        fath_occupation: fatherOccupation || null,
-        fath_contact: parseInt(fatherContact),
-        fath_email: fatherEmail || null,
-        fath_emp: fatherEmployer || null,
-        fath_emp_ad: fatherEmployerAddr || null,
-        fath_tel: fatherTelFax || null
-      });
+    const guardianInsertQuery = `
+      INSERT INTO guardian (
+        user_id, guar_fname, guar_lname, guar_middlename, guar_relation, guar_contact,
+        guar_email, guar_home_ad
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8
+      );
+    `;
+    await con.query(guardianInsertQuery, [
+      userId, guardianFirstname, guardianLastname, guardianMiddlename || null, guardianRelationship,
+      guardianContact, guardianEmail || null, guardianHomeAddr
+    ]);
 
-      await trx('guardian').insert({
-        user_id: userId,
-        guar_fname: guardianFirstname,
-        guar_lname: guardianLastname,
-        guar_middlename: guardianMiddlename || null,
-        guar_relation: guardianRelationship,
-        guar_contact: guardianContact,
-        guar_email: guardianEmail || null,
-        guar_home_ad: guardianHomeAddr
-      });
-      // Commit the transaction
-      await trx.commit();
-      res.status(201).json({ message: 'Registration successful' })
-    } catch (error) {
-      // Rollback the transaction on error
-      await trx.rollback();
-      console.error('Transaction Error:', error.message);
-      res.status(500).json({ error: 'Failed to register', details: error.message });
-    }
-  });
-  // Start the server
-  const port = 5000;
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
+    res.status(200).json({ message: 'Profile and associated data saved successfully' });
+  } catch (error) {
+    console.error('Error processing profile data:', error);
+    res.status(500).json({ error: 'Failed to save profile and associated data' });
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});

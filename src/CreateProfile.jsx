@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+
 
 function CreateProfile() {
   const navigate = useNavigate();
@@ -13,8 +14,8 @@ function CreateProfile() {
     };
   }
 
-  const [image, setImage] = useState(null);
-  const [file, setFile] = useState(null)
+  // const [image, setImage] = useState(null);
+  // const [file, setFile] = useState(null);
   const [profile, setProfile] = useState({
     firstname: '',
     lastname: '',
@@ -74,26 +75,11 @@ function CreateProfile() {
   const parentInfoHeader  = "font-montserrat text-[25px] block text-left text-white mt-[2.7rem] ml-[2.5rem] mb-[1.5rem]"
   const parentlabelstyle = "block text-left text-white font-montserrat mb-1 text-[14px] ml-[2.5rem]"
 
-  const handleImageUpload = (event) => {
-    const selectedFile = event.target.files[0];
-    if (selectedFile) {
-      const validImageTypes = ["image/jpeg", "image/png"];
-      if (!validImageTypes.includes(selectedFile.type)) {
-        alert("Please upload a valid image (JPEG/PNG).");
-        return;
-      }
-      // Create an object URL to display the image
-      const imageUrl = URL.createObjectURL(selectedFile);
-      setImage(imageUrl); // For previewing image
-      setFile(selectedFile); // For uploading the actual file
-    }
-  };
-
-
   const handleInput = (e) => {
-    e.persist();
-    setProfile({...profile, [e.target.name]: e.target.value});
-  }
+  e.persist();
+  console.log('Input changed:', e.target.name, e.target.value);  // Log field and value
+  setProfile({...profile, [e.target.name]: e.target.value});
+};
 
   const saveProfile = async (e) => {
     e.preventDefault();
@@ -101,74 +87,60 @@ function CreateProfile() {
     const formData = new FormData();
 
 
-  if (
-    profile.firstname === '' || profile.lastname === '' || profile.birthdate === '' || 
-    profile.eyecol === '' || profile.haircol === '' || profile.education === '' ||
-    profile.phonenum === '' || profile.email === '' || profile.gender === '' ||
-    profile.maritalStat === '' || profile.height === '' || profile.weight === '' ||
-    profile.street === '' || profile.barangay === '' || profile.city === '' ||
-    profile.province === '' || profile.zip === '' ||
-    profile.motherFirstname === '' || profile.motherLastname === '' || profile.motherDob === '' ||
-    profile.motherContact === '' || profile.fatherFirstname === '' || profile.fatherLastname === '' ||
-    profile.fatherDob === '' || profile.fatherContact === '' || profile.guardianFirstname === '' ||
-    profile.guardianLastname === '' || profile.guardianContact === '' || 
-    profile.guardianRelationship === '' || profile.guardianHomeAddr === ''
-  ) {
-      alert("Please add input to the required fields.");
-      return;
-  }
-  else{
+    // if (
+    //   profile.firstname === '' || profile.lastname === '' || profile.birthdate === '' || 
+    //   profile.eyecol === '' || profile.haircol === '' || profile.education === '' ||
+    //   profile.phonenum === '' || profile.email === '' || profile.gender === '' ||
+    //   profile.maritalStat === '' || profile.height === '' || profile.weight === '' ||
+    //   profile.street === '' || profile.barangay === '' || profile.city === '' ||
+    //   profile.province === '' || profile.zip === '' ||
+    //   profile.motherFirstname === '' || profile.motherLastname === '' || profile.motherDob === '' ||
+    //   profile.motherContact === '' || profile.fatherFirstname === '' || profile.fatherLastname === '' ||
+    //   profile.fatherDob === '' || profile.fatherContact === '' || profile.guardianFirstname === '' ||
+    //   profile.guardianLastname === '' || profile.guardianContact === '' || 
+    //   profile.guardianRelationship === '' || profile.guardianHomeAddr === ''
+    // ) {
+    //     alert("Please add input to the required fields.");
+    //     return;
+    // }
+    // else{
 
-    const isValidPhoneNumber = (phone) => phone.startsWith('09') && phone.length === 11 && !isNaN(phone);
-    const isValidEmail = (email) => email.includes('@') && email.endsWith('@gmail.com');
+    //   const isValidPhoneNumber = (phone) => phone.startsWith('09') && phone.length === 11 && !isNaN(phone);
+    //   const isValidEmail = (email) => email.includes('@') && email.endsWith('@gmail.com');
 
-    if (
-      !isValidPhoneNumber(profile.phonenum) ||
-      !isValidPhoneNumber(profile.motherContact) ||
-      !isValidPhoneNumber(profile.fatherContact) ||
-      !isValidPhoneNumber(profile.guardianContact)
-    ) {
-      alert("Please insert a valid contact number. It should start with '09' and be 11 digits long.");
-      return;
-    }
-    else if(
-      !isValidEmail(profile.email) ||
-      !isValidEmail(profile.motherEmail) ||
-      !isValidEmail(profile.fatherEmail)
-    ) {
-      alert("Please insert a valid email.");
-      return;
-    }
-    
-  }
-
-  if (file) {
-    formData.append("image", file);
-  }
-  else{
-    alert("Please insert an image.")
-    return;
-  }
+    //   if (
+    //     !isValidPhoneNumber(profile.phonenum) ||
+    //     !isValidPhoneNumber(profile.motherContact) ||
+    //     !isValidPhoneNumber(profile.fatherContact) ||
+    //     !isValidPhoneNumber(profile.guardianContact)
+    //   ) {
+    //     alert("Please insert a valid contact number. It should start with '09' and be 11 digits long.");
+    //     return;
+    //   }
+    //   else if(
+    //     !isValidEmail(profile.email) ||
+    //     !isValidEmail(profile.motherEmail) ||
+    //     !isValidEmail(profile.fatherEmail)
+    //   ) {
+    //     alert("Please insert a valid email.");
+    //     return;
+    //   }
+      
+    // }
 
    // Append profile data to FormData
-   Object.keys(profile).forEach(key => {
-    formData.append(key, profile[key]);
-     });
+
+   console.log('profile: ', profile)
+  
+    for (const key in profile) {
+      formData.append(key, profile[key] || ""); 
+    }
 
     try {
-      const response = await axios.post('http://localhost:5000/create-profile', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // Make sure to include this if sending files
-        },
-      });
-      console.log('Profile saved:', response.data);
-      alert('Profile Saved!')
-      location.reload()
+      navigate('/scan-face', { state: { profile } }); // Passing profile data to ScanFace.jsx
     } catch (error) {
-      console.error('Error saving profile:', error.response?.data || error.message);
+        console.error('Error saving profile:', error.response?.data || error.message);
     }
-    
-
   };
 
 
@@ -194,26 +166,9 @@ function CreateProfile() {
         <h2 className={txtfield_header}>PERSONAL INFORMATION</h2>
         <h4 className = {parentInfoHeader}>Basic Information :</h4>
 
-        <div className="grid grid-cols-1 md:grid-cols-[0.6fr_2fr] items-start">
-             {/* Left Column: Add Photo */}
-            <div className="flex flex-col items-center mt-[4.5rem] ml-[-1rem]">
-                <label htmlFor="imageUpload" className="image-upload-container">
-                {image ? (
-                <img src={image} alt="Uploaded" className="h-[200px] w-[200px] object-cover rounded-lg mb-4"/>
-                ) : (
-                <div className="h-[200px] w-[200px] border-2 border-gray-300 flex justify-center items-center rounded-lg cursor-pointer">
-                    <div className="text-center">
-                    <span className="plus-sign text-[40px] text-white font-montserrat">+</span>
-                    <p className="text-white text-[15px] font-montserrat">Add Photo</p>
-                    </div>
-                </div>
-                )}
-                </label>
-                <input className="border-white border-2" type="file" id="imageUpload" name="image" accept="image/*" onChange={handleImageUpload} style={{ display: "none" }} />
-            </div>
-
-             {/* Right Column: Input Fields */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-start">
+        {/* <div className="grid grid-cols-1 md:grid-cols-[0.6fr_2fr] items-start"> */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-start ml-[3rem]">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-start"> */}
                 <div> <label className={labelStyle} htmlFor="firstname">Firstname* </label><input className={textfield} type="text" id="firstname" name="firstname" onChange={handleInput} value = {profile.firstname}/>{renderErrorMessages("firstname")}</div>  
                 <div><label className={labelStyle} htmlFor="lastname">Lastname*</label><input className={textfield} type="text" id="lastname" name="lastname" onChange={handleInput} value = {profile.lastname}/>{renderErrorMessages("lastname")}</div>
                 <div><label className={labelStyle} htmlFor="middlename">Middlename</label><input className={textfield} type="text" id="middlename" name="middlename" onChange={handleInput} value = {profile.middlename}/></div>
@@ -226,7 +181,7 @@ function CreateProfile() {
                 <div><label className={labelStyle} htmlFor="eyecol">Eye Color*</label><input className={textfield} type="text" id="eyecol" name="eyecol" onChange={handleInput} value = {profile.eyecol}/>{renderErrorMessages("eyecol")}</div>
                 <div><label className={labelStyle} htmlFor="haircol">Hair Color*</label><input className={textfield} type="text" id="haircol" name="haircol" onChange={handleInput} value = {profile.haircol}/>{renderErrorMessages("haircol")}</div>
                 <div><label className={labelStyle} htmlFor="occupation">Occupation</label><input className={textfield} type="text" id="occupation" name="occupation" onChange={handleInput} value = {profile.occupation}/></div>
-            </div>
+            {/* </div> */}
 
         </div>
 
@@ -243,12 +198,12 @@ function CreateProfile() {
                 <label className={labelStyle} htmlFor="education">Education Level*</label>
                 <select className={textfield} id="education" name="education" onChange={handleInput} value = {profile.education}>
                     <option value="" disabled>Select</option>
-                    <option value="elementary">Elementary</option>
-                    <option value="highschool">High School</option>
-                    <option value="undergraduate">Undergraduate</option>
-                    <option value="bachelor">Bachelor's Degree</option>
-                    <option value="master">Master's Degree</option>
-                    <option value="doctorate">Doctorate</option>
+                    <option value="Elementary">Elementary</option>
+                    <option value="Highschool">High School</option>
+                    <option value="Undergraduate">Undergraduate</option>
+                    <option value="Bachelor's Degree">Bachelor's Degree</option>
+                    <option value="Master's Degree">Master's Degree</option>
+                    <option value="Doctorate">Doctorate</option>
                 </select>
             </div>
             
@@ -256,8 +211,8 @@ function CreateProfile() {
                 <label className={labelStyle} htmlFor="gender">Gender*</label>
                 <select className={textfield} id="gender" name="gender" onChange={handleInput} value = {profile.gender}>
                     <option value="" disabled>Select</option>
-                    <option value="0">Male</option>
-                    <option value="1">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
                 </select>
             </div>
             
@@ -265,10 +220,10 @@ function CreateProfile() {
                 <label className={labelStyle} htmlFor="maritalStat">Marital Status*</label>
                 <select className={textfield} id="maritalStat" name="maritalStat" onChange={handleInput} value = {profile.maritalStat}>
                     <option value="" disabled>Select</option>
-                    <option value="0">Single</option>
-                    <option value="1">Married</option>
-                    <option value="2">Divorced</option>
-                    <option value="3">Widowed</option>
+                    <option value="Single">Single</option>
+                    <option value="Married">Married</option>
+                    <option value="Divorced">Divorced</option>
+                    <option value="Widowed">Widowed</option>
                 </select>
             </div>
         </div>
