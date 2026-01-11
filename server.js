@@ -1,125 +1,153 @@
 import express from 'express';
-import multer from 'multer';
 import cors from 'cors';
-import pkg from 'pg';
-const { Client } = pkg;
+import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
 
-// Create Express app
+
 const app = express();
-const port = 5000;
+const port = 5000;  
 
 app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Adjust the size limit as needed
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-
-// Set up multer for parsing form-data (for image upload)
-const storage = multer.memoryStorage(); // Store files in memory
-const upload = multer({ storage: storage });
-
-// Database connection
-const con = new Client({
-  host: "localhost",
-  user: "postgres",
-  port: 5433,
-  password: 'hannahbisheen',
-  database: "IHCBiometric"
-});
-
-con.connect()
-  .then(() => console.log("Connected to the database"))
-  .catch(err => console.error("Connection error", err.stack));
-
-// Handle the POST request for profile
-app.post('/temp-profile', upload.single('image'), async (req, res) => { 
-  try {
-    console.log("Received data:", req.body); // Logs other fields sent in the formData
-
-    // Get the image (buffer from the form)
-    const imageBuffer = req.file?.buffer; // Multer will store the file as a buffer in `req.file`
+app.use(express.json({ limit: '50mb' })); 
+app.use(express.urlencoded({ extended: true }));
 
 
-    // Extract other profile data
-    const {
-      firstname, lastname, middlename, suffix, birthdate, eyecol, haircol,
-      occupation, education, phonenum, telnum, email, gender, maritalStat,
-      religion, nationality, height, weight, street, barangay, city, province, zip,
-      motherFirstname, motherLastname, motherMiddlename, motherDob, motherContact,
-      motherEmail, motherOccupation, motherEmployer, motherEmployerAddr, motherTelFax,
-      fatherFirstname, fatherLastname, fatherMiddlename, fatherDob, fatherContact,
-      fatherEmail, fatherOccupation, fatherEmployer, fatherEmployerAddr, fatherTelFax,
-      guardianFirstname, guardianLastname, guardianMiddlename, guardianRelationship,
-      guardianContact, guardianEmail, guardianHomeAddr
-    } = req.body;
+//db connection
+const mongoURI = 'mongodb://127.0.0.1:27017/IHCBiometric';
+mongoose.connect(mongoURI)
+    .then(() => {
+    console.log('connected to db')
+    })
+    .catch((e) => {
+        console.log(e)
+    }) 
 
-    // Step 1: Insert profile data into user_profile table
-    const userInsertQuery = `
-      INSERT INTO user_profile (
-        user_fname, user_middlename, user_lname, user_suffix, user_birthdate,
-        user_eye_color, user_hair_color, user_occupation, user_educ_lvl, user_contact,
-        user_tel_num, user_email, user_gender, user_marital_stat, user_religion,
-        user_nationality, user_height, user_weight, user_street, user_barangay, user_city,
-        user_province, user_zipcode, user_image
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
-        $21, $22, $23, $24
-      ) RETURNING user_id;
-    `;
+  
+const schema = new mongoose.Schema({
+    firstname: String,
+    lastname: String,
+    middlename: String,
+    suffix: String,
+    birthdate: String,
+    nationality: String,
+    religion: String,
+    height: String,
+    weight: String,
+    eye: String,
+    hair: String,
+    occupation: String,
+    pob: String,
+    telnum: String,
+    phonenum: String,
+    email: String,
+    education: String,
+    gender: String,
+    maritalstat: String,
+    street: String,
+    barangay: String,
+    city: String,
+    province: String,
+    zip: String,
+    mFName: String,
+    mLName: String,
+    mMiddlename: String,
+    mBdate: String,
+    mphonenum: String,
+    mEmail: String,
+    mOccupation: String,
+    mpob: String,
+    fFName: String,
+    fLName: String,
+    fMiddlename: String,
+    fBdate: String,
+    fphonenum: String,
+    fEmail: String,
+    fpob: String,
+    gFName: String,
+    gLName: String,
+    gMiddlename: String,
+    gRelationship: String,
+    gphonenum: String,
+    gEmail: String,
+    gHomeAdd: String,
+    image: String,
+})
 
-    const result = await con.query(userInsertQuery, [
-      firstname, middlename || null, lastname, suffix || null, birthdate, eyecol, haircol, occupation || null,
-      education, phonenum, telnum || null, email, gender, maritalStat, religion || null, nationality,
-      parseFloat(height), parseFloat(weight), street, barangay, city, province, zip, imageBuffer
-    ]);
+const dataModel = mongoose.model('users', schema, 'users');
 
-    const userId = result.rows[0].user_id; // Get the generated user_id
 
-    // Insert mother, father, and guardian data
-    const motherInsertQuery = `
-      INSERT INTO mother (
-        user_id, mom_fname, mom_lname, mom_middlename, mom_dob, mom_occupation,
-        mom_contact, mom_email, mom_emp, mom_emp_ad, mom_tel
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
-      );
-    `;
-    await con.query(motherInsertQuery, [
-      userId, motherFirstname, motherLastname, motherMiddlename || null, motherDob,
-      motherOccupation || null, motherContact, motherEmail || null, motherEmployer || null,
-      motherEmployerAddr || null, motherTelFax || null
-    ]);
-
-    const fatherInsertQuery = `
-      INSERT INTO father (
-        user_id, fath_fname, fath_lname, fath_middlename, fath_dob, fath_occupation,
-        fath_contact, fath_email, fath_emp, fath_emp_ad, fath_tel
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
-      );
-    `;
-    await con.query(fatherInsertQuery, [
-      userId, fatherFirstname, fatherLastname, fatherMiddlename || null, fatherDob,
-      fatherOccupation || null, fatherContact, fatherEmail || null, fatherEmployer || null,
-      fatherEmployerAddr || null, fatherTelFax || null
-    ]);
-
-    const guardianInsertQuery = `
-      INSERT INTO guardian (
-        user_id, guar_fname, guar_lname, guar_middlename, guar_relation, guar_contact,
-        guar_email, guar_home_ad
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8
-      );
-    `;
-    await con.query(guardianInsertQuery, [
-      userId, guardianFirstname, guardianLastname, guardianMiddlename || null, guardianRelationship,
-      guardianContact, guardianEmail || null, guardianHomeAddr
-    ]);
-
-    res.status(200).json({ message: 'Profile and associated data saved successfully' });
-  } catch (error) {
-    console.error('Error processing profile data:', error);
-    res.status(500).json({ error: 'Failed to save profile and associated data' });
-  }
+app.post('/temp-profile', async (req, res) => { 
+    console.log('Image: ', req.body.url)
+    console.log('Profile Data: ', req.body.users)
+    if(req.body.url && req.body.users){
+        try {
+          // Store the data and the image in MongoDB
+          const data = new dataModel({
+            firstname: req.body.users.firstname,
+            lastname: req.body.users.lastname,
+            middlename: req.body.users.middlename,
+            suffix: req.body.users.suffix,
+            birthdate: req.body.users.birthdate,
+            nationality: req.body.users.nationality,
+            religion: req.body.users.religion, 
+            height: req.body.users.height,
+            weight: req.body.users.weight,
+            eye: req.body.users.eye,
+            hair: req.body.users.hair,
+            occupation: req.body.users.occupation,
+            pob: req.body.users.pob,
+            telnum: req.body.users.telnum,
+            phonenum: req.body.users.phonenum,
+            email: req.body.users.email,
+            education: req.body.users.education,
+            gender: req.body.users.gender,
+            maritalstat: req.body.users.maritalstat,
+            street: req.body.users.street,
+            barangay: req.body.users.barangay,
+            city: req.body.users.city,
+            province: req.body.users.province,
+            zip: req.body.users.zip,
+            mFName: req.body.users.mFName,
+            mLName: req.body.users.mLName,
+            mMiddlename: req.body.users.mMiddlename,
+            mBdate: req.body.users.mBdate,
+            mphonenum: req.body.users.mphonenumber,
+            mEmail: req.body.users.mEmail,
+            mOccupation: req.body.users.mOccupation,
+            mpob: req.body.users.mpob,
+            fFName: req.body.users.fFName,
+            fLName: req.body.users.fLName,
+            fMiddlename: req.body.users.fMiddlename,
+            fBdate: req.body.users.fBdate,
+            fphonenum: req.body.users.fphonenum,
+            fEmail: req.body.users.fEmail,
+            fpob: req.body.users.fpob,
+            gFName: req.body.users.gFName,
+            gLName: req.body.users.gLName,
+            gMiddlename: req.body.users.gMiddlename,
+            gRelationship: req.body.users.gRelationship,
+            gphonenum: req.body.users.gphonenum,
+            gEmail: req.body.users.gEmail,
+            gHomeAdd: req.body.users.gHomeAdd,
+            image: req.body.url,
+          });
+      
+          await data.save();
+          res.status(200).json({
+              message: 'Registration complete',
+              users: data,
+          });
+    
+      } catch (error) {
+        console.error('Error processing profile data:', error);
+        res.status(500).json({ error: 'Failed to save profile and associated data' });
+      }
+    }
+    else{
+      console.log('Image: ', req.body.url)
+      console.log('Profile Data: ', req.body.users)
+    }
+    
 });
 
 app.listen(port, () => {

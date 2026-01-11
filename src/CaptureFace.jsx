@@ -3,79 +3,79 @@ import Webcam from "react-webcam";
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
 
+
 const Camera = () => {
   const webcamRef = useRef(null);
   const [image, setImage] = useState(null);
-  const [personalInfo, setPersonalInfo] = useState(null);
+  const [user, userInfo] = useState(null);
   const [found, setFound] = useState(false);
   const navigate = useNavigate();
   const [socket, setSocket] = useState(null);
 
-
-
-  // Connect to WebSocket server
+  
+  //WEBSOCKET CONNECTION
   useEffect(() => {
-    const newSocket = io("http://localhost:5001"); // Replace with your Flask server URL
+    const newSocket = io("http://127.0.0.1:5001"); 
     setSocket(newSocket);
-
-    // Handle incoming messages once socket is connected
     newSocket.on("response", (data) => {
       console.log("Connected!");
     });
-
-    // Cleanup on component unmount
     return () => newSocket.close();
   }, []);
 
-
-  //===================================================================================================
-
-  // Capture the image from the webcam
+  
+  // CAPTURE IMAGE FROM WEBCAM
   const capturePhoto = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setImage(imageSrc);
   }, [webcamRef]);
 
-  // Auto capture every 5 seconds
+
+  // AUTOCAPTURE EVERY 5 SECONDS
   useEffect(() => {
     const timer = setInterval(() => {
       capturePhoto();
     }, 5000);
-    // Cleanup the interval when the component unmounts
     return () => clearInterval(timer);
   }, [capturePhoto]);
 
-  //===================================================================================================
 
-  // Send captured image to the server when it's available and not found
   useEffect(() => {
     if (image && !found && socket) {
       socket.emit("send_to_flask", image);
     }
   }, [image, found, socket]);
 
-  // Listen for responses from the Flask server
+
   useEffect(() => {
     if (socket) {
       socket.on("receive_from_flask", (response) => {
         console.log("Response received from Flask:", response);
-        if (response) {
-          setPersonalInfo(response);
+  
+        if (response && response.status === "success") {
+          userInfo(response.user);
           setFound(true);
-          navigate("/view-profile", { state: { data: response } });
+          navigate("/view-profile", { state: { users: response.user } });
+        } else if (response && response.status === "failure") {
+          alert(response.message || "No match found, register first.");
+          navigate("/");
+        } else {
+          alert("Unexpected error. Please try again.");
+          navigate("/create-profile");
         }
       });
-
-      // Cleanup the event listener when the component unmounts
+  
       return () => {
         socket.off("receive_from_flask");
       };
     }
   }, [socket, navigate]);
-// 
+  
+
+  
 
   const videoConstraints = {
-    width: 500,
+    width: 600,
     facingMode: "environment",
   };
 
@@ -93,24 +93,11 @@ const Camera = () => {
       <h1 className="text-[20px] font-montserrat text-white">Scanning...</h1>
       </div>
 
-      {/* Display captured image */}
-      {/* {image && (
-        <div className="captured-image mt-4">
-          <h2 className="text-xl text-white">Captured Image:</h2>
-          <img
-            src={image}
-            alt="Captured"
-            className="rounded-md border-2 border-white"
-            style={{ width: "300px", height: "auto" }}
-          />
-        </div>
-      )} */}
-
       {/* Display personal information if a match is found */}
-      {found && personalInfo && (
+      {found && userInfo && (
         <div className="profile-info mt-4">
           <h2 className="text-xl text-white">Profile Found:</h2>
-          <p className="text-white">{JSON.stringify(personalInfo)}</p>
+          <p className="text-white">{JSON.stringify(userInfo)}</p>
         </div>
       )}
     </div>
