@@ -173,8 +173,8 @@ function CreateProfile() {
                 <div><label className={labelStyle} htmlFor="religion">Religion*</label><input className={textfield} type="text" id="religion" name="religion" onChange={handleInput} value = {profile.religion}/>{renderErrorMessages("religion")}</div>
                 <div><label className={labelStyle} htmlFor="height">Height*</label><input className={textfield} type="number" id="height" name="height" onChange={handleInput} value = {profile.height}/>{renderErrorMessages("height")}</div>
                 <div><label className={labelStyle} htmlFor="weight">Weight*</label><input className={textfield} type="number" id="weight" name="weight" onChange={handleInput} value = {profile.weight}/>{renderErrorMessages("weight")}</div>
-                <div><label className={labelStyle} htmlFor="eyecol">Eye Color*</label><input className={textfield} type="text" id="eyecol" name="eyecol" onChange={handleInput} value = {profile.eye}/>{renderErrorMessages("eyecol")}</div>
-                <div><label className={labelStyle} htmlFor="haircol">Hair Color*</label><input className={textfield} type="text" id="haircol" name="haircol" onChange={handleInput} value = {profile.hair}/>{renderErrorMessages("haircol")}</div>
+                <div><label className={labelStyle} htmlFor="eye">Eye Color*</label><input className={textfield} type="text" id="eye" name="eye" onChange={handleInput} value = {profile.eye}/>{renderErrorMessages("eye")}</div>
+                <div><label className={labelStyle} htmlFor="hair">Hair Color*</label><input className={textfield} type="text" id="hair" name="hair" onChange={handleInput} value = {profile.hair}/>{renderErrorMessages("hair")}</div>
                 <div><label className={labelStyle} htmlFor="occupation">Occupation</label><input className={textfield} type="text" id="occupation" name="occupation" onChange={handleInput} value = {profile.occupation}/></div>
                 <div><label className={labelStyle} htmlFor="pob">Place of Birth*</label><input className={textfield} type="text" id="pob" name="pob" onChange={handleInput} value = {profile.pob}/></div>
 
@@ -214,8 +214,8 @@ function CreateProfile() {
             </div>
             
             <div>
-                <label className={labelStyle} htmlFor="maritalStat">Marital Status*</label>
-                <select className={textfield} id="maritalStat" name="maritalStat" onChange={handleInput} value = {profile.maritalstat}>
+                <label className={labelStyle} htmlFor="maritalstat">Marital Status*</label>
+                <select className={textfield} id="maritalstat" name="maritalstat" onChange={handleInput} value = {profile.maritalstat}>
                     <option value="" disabled>Select</option>
                     <option value="Single">Single</option>
                     <option value="Married">Married</option>
@@ -243,13 +243,13 @@ function CreateProfile() {
             <div id='mother-info'>
             <h3 className = {parentInfoHeader}>Mother's Info :</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div> <label className={parentlabelstyle} htmlFor="m-firstname">Firstname*</label><input className={textfield} type="text" id="m-firstname" name="motherFirstname" onChange={handleInput} value = {profile.mFName}/>{renderErrorMessages("motherFirstname")}</div> 
-              <div><label className={parentlabelstyle} htmlFor="m-lastname">Lastname*</label><input className={textfield} type="text" id="m-lastname" name="motherLastname" onChange={handleInput} value = {profile.mLName}/>{renderErrorMessages("motherLastname")}</div>
-              <div><label className={parentlabelstyle} htmlFor="m-middlename">Middlename</label><input className={textfield} type="text" id="m-middlename" name="motherMiddlename" onChange={handleInput} value = {profile.mMiddlename}/></div>
-              <div><label className={parentlabelstyle} htmlFor="m-birthdate">Birthdate*</label><input className={textfield} type="date" id="m-birthdate" name="motherDob" onChange={handleInput} value = {profile.mBdate}/>{renderErrorMessages("motherDob")}</div>
-              <div><label className={parentlabelstyle} htmlFor="m-phonenum">Phone Number*</label><input className={textfield} type="number" id="m-phonenum" name="motherContact" onChange={handleInput} value = {profile.mphonenum}/>{renderErrorMessages("motherContact")}</div>
-              <div><label className={parentlabelstyle} htmlFor="m-email">Email</label><input className={textfield} type="text" id="m-email" name="motherEmail" onChange={handleInput} value = {profile.mEmail}/>{renderErrorMessages("motherEmail")}</div>
-             <div> <label className={parentlabelstyle} htmlFor="m-occupation">Occupation</label><input className={textfield} type="text" id="m-occupation" name="motherOccupation" onChange={handleInput} value = {profile.mOccupation}/>{renderErrorMessages("motherOccupation")}</div>
+              <div> <label className={parentlabelstyle} htmlFor="mFName">Firstname*</label><input className={textfield} type="text" id="mFName" name="mFName" onChange={handleInput} value = {profile.mFName}/>{renderErrorMessages("mFName")}</div> 
+              <div><label className={parentlabelstyle} htmlFor="mLName">Lastname*</label><input className={textfield} type="text" id="mLName" name="mLName" onChange={handleInput} value = {profile.mLName}/>{renderErrorMessages("mLName")}</div>
+              <div><label className={parentlabelstyle} htmlFor="mMiddlename">Middlename</label><input className={textfield} type="text" id="mMiddlename" name="mMiddlename" onChange={handleInput} value = {profile.mMiddlename}/></div>
+              <div><label className={parentlabelstyle} htmlFor="mBdate">Birthdate*</label><input className={textfield} type="date" id="mBdate" name="mBdate" onChange={handleInput} value = {profile.mBdate}/>{renderErrorMessages("mBdate")}</div>
+              <div><label className={parentlabelstyle} htmlFor="mphonenum">Phone Number*</label><input className={textfield} type="number" id="mphonenum" name="mphonenum" onChange={handleInput} value = {profile.mphonenum}/>{renderErrorMessages("mphonenum")}</div>
+              <div><label className={parentlabelstyle} htmlFor="mEmail">Email</label><input className={textfield} type="text" id="mEmail" name="mEmail" onChange={handleInput} value = {profile.mEmail}/>{renderErrorMessages("mEmail")}</div>
+             <div> <label className={parentlabelstyle} htmlFor="mOccupation">Occupation</label><input className={textfield} type="text" id="mOccupation" name="mOccupation" onChange={handleInput} value = {profile.mOccupation}/>{renderErrorMessages("mOccupation")}</div>
               <div><label className={parentlabelstyle} htmlFor="mpob">Place of Birth*</label><input className={textfield} type="text" id="mpob" name="mpob" onChange={handleInput} value = {profile.mpob}/></div>
 
             </div>
@@ -259,13 +259,13 @@ function CreateProfile() {
             <div id='father-info'>
             <h3 className = {parentInfoHeader}>Father's Info :</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div> <label className={parentlabelstyle} htmlFor="f-firstname">Firstname*</label><input className={textfield} type="text" id="f-firstname" name="fatherFirstname" onChange={handleInput} value = {profile.fFName}/>{renderErrorMessages("fatherFirstname")}</div>  
-                <div><label className={parentlabelstyle}  htmlFor="f-lastname">Lastname*</label><input className={textfield} type="text" id="f-lastname" name="fatherLastname" onChange={handleInput} value = {profile.fLName}/>{renderErrorMessages("fatherLastname")}</div>
-                <div><label className={parentlabelstyle}  htmlFor="f-middlename">Middlename</label><input className={textfield} type="text" id="f-middlename" name="fatherMiddlename" onChange={handleInput} value = {profile.FMiddlename}/></div>
-                <div><label className={parentlabelstyle} htmlFor="f-birthdate">Birthdate*</label><input className={textfield} type="date" id="f-birthdate" name="fatherDob" onChange={handleInput} value = {profile.fBdate}/>{renderErrorMessages("fatherDob")}</div>
-                <div><label className={parentlabelstyle}  htmlFor="f-phonenum">Phone Number*</label><input className={textfield} type="number" id="f-phonenum" name="fatherContact" onChange={handleInput} value = {profile.fphonenum}/>{renderErrorMessages("fatherContact")}</div>
-                <div><label className={parentlabelstyle} htmlFor="f-email">Email</label><input className={textfield} type="text" id="f-email" name="fatherEmail" onChange={handleInput} value = {profile.fEmail}/>{renderErrorMessages("fatherEmail")}</div>
-                <div> <label className={parentlabelstyle} htmlFor="f-occupation">Occupation</label><input className={textfield} type="text" id="f-occupation" name="fatherOccupation" onChange={handleInput} value = {profile.fOccupation}/>{renderErrorMessages("fatherOccupation")}</div>  
+                <div> <label className={parentlabelstyle} htmlFor="fFName">Firstname*</label><input className={textfield} type="text" id="fFName" name="fFName" onChange={handleInput} value = {profile.fFName}/>{renderErrorMessages("fFName")}</div>  
+                <div><label className={parentlabelstyle}  htmlFor="fLName">Lastname*</label><input className={textfield} type="text" id="fLName" name="fLName" onChange={handleInput} value = {profile.fLName}/>{renderErrorMessages("fLName")}</div>
+                <div><label className={parentlabelstyle}  htmlFor="fMiddlename">Middlename</label><input className={textfield} type="text" id="fMiddlename" name="fMiddlename" onChange={handleInput} value = {profile.FMiddlename}/></div>
+                <div><label className={parentlabelstyle} htmlFor="fBdate">Birthdate*</label><input className={textfield} type="date" id="fBdate" name="fBdate" onChange={handleInput} value = {profile.fBdate}/>{renderErrorMessages("fBdate")}</div>
+                <div><label className={parentlabelstyle}  htmlFor="fphonenum">Phone Number*</label><input className={textfield} type="number" id="fphonenum" name="fphonenum" onChange={handleInput} value = {profile.fphonenum}/>{renderErrorMessages("fphonenum")}</div>
+                <div><label className={parentlabelstyle} htmlFor="fEmail">Email</label><input className={textfield} type="text" id="fEmail" name="fEmail" onChange={handleInput} value = {profile.fEmail}/>{renderErrorMessages("fEmail")}</div>
+                <div> <label className={parentlabelstyle} htmlFor="fOccupation">Occupation</label><input className={textfield} type="text" id="fOccupation" name="fOccupation" onChange={handleInput} value = {profile.fOccupation}/>{renderErrorMessages("fOccupation")}</div>  
                 <div><label className={parentlabelstyle} htmlFor="fpob">Place of Birth*</label><input className={textfield} type="text" id="fpob" name="fpob" onChange={handleInput} value = {profile.fpob}/></div>
             </div>
             </div>
@@ -276,13 +276,13 @@ function CreateProfile() {
             <h2 className={txtfield_header}>GUARDIAN/ CO-PARENT INFORMATION</h2>
             <div id='mother-info'>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div> <label className={parentlabelstyle} htmlFor="g-firstname">Firstname*</label><input className={textfield} type="text" id="g-firstname" name="guardianFirstname" onChange={handleInput} value = {profile.gFName}/>{renderErrorMessages("guardianFirstname")}</div>  
-                <div><label className={parentlabelstyle}  htmlFor="g-lastname">Lastname*</label><input className={textfield} type="text" id="g-lastname" name="guardianLastname" onChange={handleInput} value = {profile.gLName}/>{renderErrorMessages("guardianLastname")}</div>
-                <div><label className={parentlabelstyle}  htmlFor="g-middlename">Middlename</label><input className={textfield} type="text" id="g-middlename" name="guardianMiddlename" onChange={handleInput} value = {profile.gMiddlename}/></div>
-                <div><label className={parentlabelstyle}  htmlFor="relationship">Relationship*</label><input className={textfield} type="text" id="relationship" name="guardianRelationship" onChange={handleInput} value = {profile.gRelationship}/>{renderErrorMessages("guardianRelationship")}</div>
-                <div><label className={parentlabelstyle}  htmlFor="g-phonenum">Phone Number*</label><input className={textfield} type="number" id="g-phonenum" name="guardianContact" onChange={handleInput} value = {profile.gphonenum}/>{renderErrorMessages("guardianContact")}</div>
-                <div><label className={parentlabelstyle}  htmlFor="g-email">Email</label><input className={textfield} type="text" id="g-email" name="guardianEmail" onChange={handleInput} value = {profile.gEmail}/>{renderErrorMessages("guardianEmail")}</div>
-                <div><label className={parentlabelstyle}  htmlFor="homead">Home Address*</label><input className="h-[2.5rem] w-[37rem] p-2 bg-white rounded-md text-txt-color font-montserrat text-[16px] border border-gray-300 ml-[2.5rem]" type="text" id="homead" name="guardianHomeAddr" onChange={handleInput} value = {profile.guardianHomeAddr}/>{renderErrorMessages("guardianHomeAddr")}</div>
+                <div> <label className={parentlabelstyle} htmlFor="gFName">Firstname*</label><input className={textfield} type="text" id="gFName" name="gFName" onChange={handleInput} value = {profile.gFName}/>{renderErrorMessages("gFName")}</div>  
+                <div><label className={parentlabelstyle}  htmlFor="gLName">Lastname*</label><input className={textfield} type="text" id="gLName" name="gLName" onChange={handleInput} value = {profile.gLName}/>{renderErrorMessages("gLName")}</div>
+                <div><label className={parentlabelstyle}  htmlFor="gMiddlename">Middlename</label><input className={textfield} type="text" id="gMiddlename" name="gMiddlename" onChange={handleInput} value = {profile.gMiddlename}/></div>
+                <div><label className={parentlabelstyle}  htmlFor="gRelationship">Relationship*</label><input className={textfield} type="text" id="gRelationship" name="gRelationship" onChange={handleInput} value = {profile.gRelationship}/>{renderErrorMessages("gRelationship")}</div>
+                <div><label className={parentlabelstyle}  htmlFor="gphonenum">Phone Number*</label><input className={textfield} type="number" id="gphonenum" name="gphonenum" onChange={handleInput} value = {profile.gphonenum}/>{renderErrorMessages("gphonenum")}</div>
+                <div><label className={parentlabelstyle}  htmlFor="gEmail">Email</label><input className={textfield} type="text" id="gEmail" name="gEmail" onChange={handleInput} value = {profile.gEmail}/>{renderErrorMessages("gEmail")}</div>
+                <div><label className={parentlabelstyle}  htmlFor="gHomeAdd">Home Address*</label><input className="h-[2.5rem] w-[37rem] p-2 bg-white rounded-md text-txt-color font-montserrat text-[16px] border border-gray-300 ml-[2.5rem]" type="text" id="gHomeAdd" name="gHomeAdd" onChange={handleInput} value = {profile.gHomeAdd}/>{renderErrorMessages("gHomeAdd")}</div>
                 </div>
             </div>
             </div>

@@ -57,11 +57,12 @@ const Camera = () => {
           setFound(true);
           navigate("/view-profile", { state: { users: response.user } });
         } else if (response && response.status === "failure") {
-          alert(response.message || "No match found, register first.");
-          navigate("/");
+          alert(response.message || "No profile found, register first.");
+          navigate("/create-profile");
+          location.reload()
         } else {
           alert("Unexpected error. Please try again.");
-          navigate("/create-profile");
+          navigate("/");
         }
       });
   
